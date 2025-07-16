@@ -17,7 +17,7 @@ body {
 }
 
 .contenedor {
-    width: 40%;
+    width: 60%;
     height: 90%;
     margin: 30px auto;
     background-color: white;
@@ -36,10 +36,10 @@ label {
     font-weight: bold;
 }
 input{
-   width: 95%; 
+   width: 45%; 
 }
 select{
-    width: 100%;
+    width: 50;
 }
 input, select {
     padding: 8px;
@@ -77,4 +77,38 @@ footer {
     width: 100%;
     margin-top: 0;
     z-index: 100;
+}
+#notificacion {
+  display: none;
+  position: fixed;
+  top  : 20px; /* o usa top: 20px para mostrarla arriba */
+  right: 20px;
+  background: #d4edda;
+  color: #155724;
+  padding: 12px 18px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+@media (max-width: 600px) {
+  .contenedor {
+    width: 95%;
+    padding: 10px;
+  }
+  h1, h2 {
+    font-size: 2em;
+  }
+  label, input, select, button {
+    font-size: 1.2em;
+  }
+  input, select, button {
+    padding: 14px;
+  }
+  footer, header {
+    font-size: 1.1em;
+    padding: 18px;
+    height: auto;
+  }
 }
