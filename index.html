@@ -35,13 +35,30 @@
       <button type="submit">Crear Torneo</button>
     </form>
   </div>
+<!-- Sección para ingresar los equipos -->
 <section>
     <div class="contenedor">
-
-        <h1>prueba</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti cumque quaerat error molestiae, dignissimos, beatae ea itaque impedit possimus fugit reprehenderit animi voluptate! Beatae ut et laborum eveniet vero repellat!</p>
+        <h1 class="TorneoN"></h1>
+        <div class="equipos">
+            <h2>Ingrese Nombre de equipos</h2>
+            <form id="formEquipos">
+                <div class="equipo-inputs">
+                  <ul id="listaEquipos"></ul>
+                </div>
+                <button type="submit">Registrar Equipos</button>
+            </form>
+        </div>
     </div>
 </section>
+<!--Simular torneo-->
+<section id="simulacionTorneo" style="display:none;">
+  <div class="contenedor">
+      <div id="partidos">
+        <h2>Simulación de Partidos</h2>
+        <p>Los partidos se mostrarán aquí una vez que se registren los equipos.</p>
+      </div>
+  </div>
+    </section>
   <footer>
     &copy; 2025 LeagueAL <br> Desarrollado por Adrian Gomez y Luis Cortes
   </footer>

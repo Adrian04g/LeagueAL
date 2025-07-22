@@ -112,3 +112,17 @@ footer {
     height: auto;
   }
 }
+.resultado-input {
+  width: 40px;
+  max-width: 40px;
+  min-width: 30px;
+  text-align: center;
+  font-size: 1.1em;
+  padding: 4px;
+}
+span{
+  font-size: 1.1em;
+  margin: 0 5px;
+  display: inline-block;
+  width: 50px; /* Ajusta el ancho según sea necesario */
+}
