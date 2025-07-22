@@ -3,7 +3,6 @@ const torneoN = document.querySelector(".TorneoN");
 const listaEquipos = document.getElementById("listaEquipos");
 const formTorneo = document.getElementById("formTorneo");
 let Nequipos = 0;
-
 formTorneo.addEventListener("submit", function(e) {
   e.preventDefault();
   const nombre = document.getElementById("torneo").value;
@@ -15,10 +14,10 @@ formTorneo.addEventListener("submit", function(e) {
   setTimeout(() => {
     notif.style.display = "none";
   }, 4000);
-
   // Mostrar la sección
-  document.querySelector("section").style.display = "block";
-
+  document.querySelector("#equipos").style.display = "block";
+  document.querySelector("#formularioTorneo").style.display = "none";
+  nombreT = nombre; // Guardar el nombre del torneo
   // Actualizar el h1 con el nombre del torneo
   torneoN.innerText = `Torneo: ${nombre}`;
 
@@ -42,7 +41,6 @@ formEquipos.addEventListener("submit", function(e) {
   e.preventDefault();
   const inputs = document.querySelectorAll(".equipo-input");
   const equipos = Array.from(inputs).map(input => input.value.trim()).filter(value => value !== "");
-
   // sección de simulación
   const simulacionTorneo = document.getElementById("simulacionTorneo");
   simulacionTorneo.style.display = "block";
@@ -136,29 +134,52 @@ function mostrarSimulacionPartidos(equipos) {
   // Evento para registrar resultados manuales
   btnRegistrar.onclick = function() {
     let resultados = [];
+    let ganadores = [];
     partidos.forEach((partido, idx) => {
       const inputA = document.getElementById(`resultadoA${idx}`);
       const inputB = document.getElementById(`resultadoB${idx}`);
       resultados.push({
         partido: `${partido.equipoA} vs ${partido.equipoB}`,
         resultado: `${inputA.value} - ${inputB.value}`
+        // Agregar partido detallado
+        ,
+        partidoD: `${partido.equipoA} ${inputA.value} - ${inputB.value} ${partido.equipoB}`
+      
       });
+      // Determinar ganador de cada partido
+      const golA = parseInt(inputA.value);
+      const golB = parseInt(inputB.value);
+      if (!isNaN(golA) && !isNaN(golB)) {
+        if (golA > golB) {
+          ganadores.push(partido.equipoA);
+        } else if (golB > golA) {
+          ganadores.push(partido.equipoB);
+        } else {
+          // Si hay empate, elige aleatorio
+          ganadores.push(Math.random() < 0.5 ? partido.equipoA : partido.equipoB);
+        }
+      }
     });
     notif.innerText = `✅ Resultados registrados: ${resultados.map(r => r.partido + ' ' + r.resultado).join(', ')}`;
     notif.style.display = "block";
     setTimeout(() => { notif.style.display = "none"; }, 4000);
-    // Mostrar los partidos y resultados en el documento
     mostrarResultadosEnDocumento(resultados);
+    // Iniciar eliminatoria si hay más de 1 ganador
+    if (ganadores.length > 1) {
+      iniciarEliminatoriaInteractiva(ganadores);
+    } else if (ganadores.length === 1) {
+      mostrarGanadorFinal(ganadores[0]);
+    }
   };
 }
 
 // Función para mostrar los partidos y resultados en el documento
 function mostrarResultadosEnDocumento(resultados) {
-  let resultadosDiv = document.getElementById("resultadosPartidos");
+  let resultadosDiv = document.getElementById("Partidos");
   if (!resultadosDiv) {
     resultadosDiv = document.createElement("div");
     resultadosDiv.className = "contenedor";
-    resultadosDiv.id = "resultadosPartidos";
+    resultadosDiv.id = "Partidos";
     resultadosDiv.style.marginTop = "20px";
     resultadosDiv.innerHTML = "<h2>Resultados de los Partidos</h2>";
     document.body.appendChild(resultadosDiv);
@@ -168,8 +189,129 @@ function mostrarResultadosEnDocumento(resultados) {
   const ul = document.createElement("ul");
   resultados.forEach(r => {
     const li = document.createElement("li");
-    li.textContent = `${r.partido}: ${r.resultado}`;
+    li.textContent = `${r.partidoD}`;
     ul.appendChild(li);
   });
   resultadosDiv.appendChild(ul);
+}
+
+// Función para mostrar la eliminatoria interactiva hasta el ganador
+function iniciarEliminatoriaInteractiva(equiposIniciales) {
+  let ronda = 1;
+  // Mezclar aleatoriamente los equipos solo en la primera ronda
+  let equipos = [...equiposIniciales];
+  for (let i = equipos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [equipos[i], equipos[j]] = [equipos[j], equipos[i]];
+  }
+  mostrarRonda(equipos, ronda);
+}
+
+function mostrarRonda(equipos, ronda) {
+  let resultadosDiv = document.getElementById("Partidos");
+  if (!resultadosDiv) {
+    resultadosDiv = document.createElement("div");
+    resultadosDiv.className = "contenedor";
+    resultadosDiv.id = "Partidos";
+    resultadosDiv.style.marginTop = "20px";
+    document.body.appendChild(resultadosDiv);
+  }
+  // Mensaje especial según cantidad de equipos
+  let mensajeRonda = "";
+  switch (equipos.length) {
+    case 32:
+      mensajeRonda = "<h2>16avos de final</h2>";
+      break;
+    case 16:
+      mensajeRonda = "<h2>Octavos de final</h2>";
+      break;
+    case 8:
+      mensajeRonda = "<h2>Cuartos de final</h2>";
+      break;
+    case 4:
+      mensajeRonda = "<h2>Semifinales</h2>";
+      break;
+    case 2:
+      mensajeRonda = "<h2>Final</h2>";
+      break;
+    default:
+      mensajeRonda = `<h3>Ronda ${ronda}</h3>`;
+  }
+  resultadosDiv.innerHTML += mensajeRonda;
+  const rondaDiv = document.createElement("div");
+  rondaDiv.className = "ronda-eliminatoria";
+  rondaDiv.innerHTML = "";
+  let partidos = [];
+  for (let i = 0; i < equipos.length; i += 2) {
+    const equipoA = equipos[i];
+    const equipoB = equipos[i+1];
+    if (!equipoB) break;
+    partidos.push({ equipoA, equipoB });
+    rondaDiv.innerHTML += `
+      <div class="partido-item">
+        <span>${equipoA}</span>
+        <input type="number" min="0" class="resultado-input" placeholder="0" id="eliminatoriaA${ronda}_${i}">
+        vs
+        <input type="number" min="0" class="resultado-input" placeholder="0" id="eliminatoriaB${ronda}_${i}">
+        <span>${equipoB}</span>
+      </div>
+    `;
+  }
+  // Botón para registrar resultados de la ronda
+  const btnRonda = document.createElement("button");
+  btnRonda.textContent = "Registrar Resultados Ronda " + ronda;
+  btnRonda.className = "btn-ronda";
+  rondaDiv.appendChild(btnRonda);
+  resultadosDiv.appendChild(rondaDiv);
+  btnRonda.onclick = function() {
+    let ganadores = [];
+    let hayEmpate = false;
+    for (let i = 0; i < partidos.length; i++) {
+      const inputA = document.getElementById(`eliminatoriaA${ronda}_${i}`);
+      const inputB = document.getElementById(`eliminatoriaB${ronda}_${i}`);
+      const golA = parseInt(inputA.value);
+      const golB = parseInt(inputB.value);
+      if (!isNaN(golA) && !isNaN(golB)) {
+        if (golA === golB) {
+          hayEmpate = true;
+          inputA.style.border = "2px solid red";
+          inputB.style.border = "2px solid red";
+        } else {
+          inputA.style.border = "";
+          inputB.style.border = "";
+          if (golA > golB) {
+            ganadores.push(partidos[i].equipoA);
+          } else {
+            ganadores.push(partidos[i].equipoB);
+          }
+        }
+      }
+    }
+    if (hayEmpate) {
+      notif.innerText = "❌ No puede haber empate. Modifica los resultados para cada partido.";
+      notif.style.display = "block";
+      setTimeout(() => { notif.style.display = "none"; }, 4000);
+      return;
+    }
+    rondaDiv.innerHTML += `<p>Ganadores: ${ganadores.join(", ")}</p>`;
+    btnRonda.disabled = true;
+    if (ganadores.length > 1) {
+      mostrarRonda(ganadores, ronda + 1);
+    } else if (ganadores.length === 1) {
+      mostrarGanadorFinal(ganadores[0]);
+    }
+  };
+}
+
+// Función para mostrar el ganador final
+function mostrarGanadorFinal(ganador) {
+  let resultadosDiv = document.getElementById("Partidos");
+  if (!resultadosDiv) {
+    resultadosDiv = document.createElement("div");
+    resultadosDiv.className = "contenedor";
+    resultadosDiv.id = "Partidos";
+    resultadosDiv.style.marginTop = "20px";
+    document.body.appendChild(resultadosDiv);
+  }
+  resultadosDiv.innerHTML += `<h2>🏆 Ganador del Torneo: ${ganador}</h2>`;
 }
