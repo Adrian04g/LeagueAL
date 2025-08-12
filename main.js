@@ -33,7 +33,7 @@ formTorneo.addEventListener("submit", function(e) {
     listaEquipos.appendChild(li);
   }
 });
-
+// comentario de prueba
 // Manejo del formulario de equipos
 const formEquipos = document.getElementById("formEquipos");
 
